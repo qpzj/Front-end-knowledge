@@ -1,0 +1,446 @@
+                vue笔记
+v-on:  事件绑定机制   @
+v-clock  解决插值表达式闪烁问题
+v-text  会覆盖元素中原本的内容
+v-html  可以识别网页标签
+v-bind  提供用于绑定属性的指令   : 在vue中绑定样式的方法 v-bind：class或 v-bind：style
+v-model  双向绑定数据
+v-for  用与遍历普通数组，对象数组，对象，还可以放数字  key属性只接受string/number
+v-if  每次都会重新删除或创建元素
+v-show  每次不会重新进行DOM的删除和创建操作，只是切换了元素的display：none样式
+
+
+事件修饰符
+.stop 阻止冒泡
+.prevent 阻止默认事件
+.capture  添加事件监听器时使用事件捕获模式
+.self  只当事件在该元素本身触发时触发回调
+.once  事件只触发一次
+
+过滤器
+过滤器的两个条件[过滤器名称和处理函数]
+vue.filter('msgFormat'，function(msg){
+    return msg.replace(/单纯/g'邪恶')
+})
+
+自定义修饰符
+
+vue中提供的内置按键修饰符
+.enter .tab .delete .esc .space .up .down .left .right
+Vue.config.keycodes.f2=113
+keyup.f2='add'
+
+自定义全局指令
+有两个属性 第一个指令名称  第二个是一个对象,这个对象有一些指令相关的函数，这些函数像钩子函数一样
+Vue.directive('focus',{})
+bind:function(){}每当指令绑定到元素上的时候，会立即执行这个bind函数，只执行一次
+inserted：function(){}inserted表示元素插到DOM中的时候，会执行inserted函数
+updated：function(){}当vnode更新的时候，会执行updated，可能触发多次
+
+生命周期函数
+beforeCreate  data和methods还没初始化
+create  data和methods已经初始化  methods中的方法最快在这里调用
+beforeMount  模板已经编译成功 但是还没渲染到页面中
+mount  内存的模板已经挂载到了页面中，用户已经可以看到渲染好的页面了
+beforeUpdate  更新的数据还是旧的
+Updata  已经更新好数据
+beforeDestroy  开始销毁
+destiny  销毁结束
+
+vue-resource发起get、post、jsonp请求(axios)
+通过this.$http来发起请求
+this.$http.get('url').then(function(result){})
+可以先判断result.status是否等于0，等于0就代表成功了
+
+动画 使用过渡类名实现动画
+v-enter  动画进入前的状态
+v-leave-to 动画的结束状态
+v-enter-active  入场动画的时间段
+v-leave-active  离场动画的时间段
+
+组件
+使用vue.extend创建全局组件
+vue.extend({
+    template: 组件模板
+})
+vue.component('组件名'，com1)
+另一种创建方式
+Vue.component('组件名'，{
+    template： 组件模板
+})
+template属性指向内容模板
+组件中的data必须是一个方法，而且还必须返回一个对象
+mode属性设置组件切换时候的模式
+
+父组件向子组件传值
+子组件默认无法访问父组件的数据，可以通过v-bind的形式，传递到子组件内部，供子组件使用，
+把父组件传递过来的parentmsg属性，先在props数组中定义一下才能使用
+
+父组件把方法传递给子组件
+使用的是事件绑定机制v-on  还要在方法中写上 this.$emit @func="show"  
+ref获取DOM元素和组件
+在组件上定义ref可以获取组件上的数据和组件上的方法
+
+路由
+var routerobj = new VueRouter()
+routes:[  //路由匹配规则
+    {path:'/login',component:login}
+    {path:'/register',component:register}
+]
+要将路由规则对象注册到vm实例上
+router：routerobj
+<route-view></route-view>  //组件要展示的位置
+<router-link to='/login'></router-link>  //渲染一个a标签，可用于组件切换，可以用tag="span"来修改
+路由可以使用redirect来重定向，用于修改默认展示组件
+{path："/",redirect:"/login"}
+为路由添加类样式
+第一种方式
+.router-link-active
+第二种方式  在new路由过程中使用
+linkActiveClass："myactive"
+使用children属性实现路由嵌套
+{path："/app" children:[
+    {path:'login',component:login}
+    {path:'register',component:register}
+]}
+路由的基本使用
+1.导入包
+2.创建子组件
+3.创建一个路由对象  定义路由规则数组 后面可以写和激活相关的类
+4.挂载在vm实例上
+5.在HTML页面上放置容器<router-view></router-view>
+6.路由切换 <router-link to="login"></router-link>
+7.设置默认界面用{path：'/',redirect:'/login'}
+keyup监听文本框中的值发生变化
+watch监听文本框数据的变化  用于监听路由地址的改变
+
+计算属性的使用
+computer：{//在computer中可以定义一些属性用于作为数据发生变化时触发的‘方法’，
+计算属性在调用时一定不要加()当做普通属性使用}
+
+webpack
+项目目录  
+dist文件是编译后或解压后的代码，最终发布的代码
+src文件是源码文件
+dest文件夹是压缩文件夹
+main.js是我们项目的js入口文件，导入库都在这操作
+webpack项目打包
+1.npm init -y   创建项目包管理文件
+2.全局打包
+安装webpack包，注意建议不要安装默认的最新版的 npm i webpack@3.4.1
+打包操作  webpack  .\src\main.js  .\dist\bundle.js
+全局打包的局限性 每次都得重新打包 麻烦 (我们要经常调试代码)
+2.插件打包
+安装打包工具  cnpm i webpack-dev-server -D
+新建一个 webpack.config.js文件
+！如果警告没有装webpack我们需要装一下
+cnpm i webpack@3.4.1 -D
+webpack.config.js写入语法
+var path = require('path')
+model.exports={
+    entry:path.join(_dirname,'./src/main.js'),   //入口文件
+    output:{
+        path:path.join(_dirname,'./dist'),  //输出路径
+        filename:'bundle.js'   //指定输出文件的名称
+    }
+}
+完成实时编译功能
+package.json--scripts--"dev":"webpack-dev-server--open--port 3000 --contentBase src--hot"
+因为此时系统默认根路径中没有bundle.js,我们要把bundle.js生成到内存中
+安装工具 cnpm i html-webpack-plugin -D
+webpack.config.js--var htmlWebpackPlugin = require('html-webpack-plugin')
+output:{...}
+plugins:[
+    new htmlWebpackPlugin({
+        template:path.join(_dirname,'./src/index.html')   //指定模板文件路径
+        filename:'index.html'   //设置生成的内存页面
+    })
+]
+webpack基本配置2
+引入样式文件  webpack默认处理不了css文件样式
+引入loader包
+cnpm i style-loader css-loader -D
+引入url地址
+cnpm i url-loader file-loader -D
+使用url处理字体文件
+
+webpack中的babel配置
+webpack中处理不了ES6高级语法，使用Babel可以实现高级语法到低级语法的转义
+安装两套包
+cnpm i babel-core babel-loader babel-plugin-transform-runtime -D
+cnpm i babel-preset-env babel-preset-stage-0 -D
+
+plugins:[...]
+module：[
+    rules:[
+        {test:/\.css$/,use:['style-loader','css-loader',/*'less-loader'*/]}
+        {test:/\.(jpg|png|gif|bmp|jpg)$/,use:['url-loader']}
+        {test:/\.(ttf|eot|svg|woff|woff2)$/,use:['url-loader']}
+        {test:/\.js$/,use:'babel-loader',exclude:/node_modules/}  //排除node_modules文件，不排除babel会编译node_modules包中的内容，耗cpu，影响项目正常运行。
+
+    ]
+]
+新建一个.babelrc的配置文件，属于json格式，json语法
+{
+    "presets":["env","stage-0"],
+    "plugins":["transform-runtime"]
+}
+
+
+一个简单的项目中经常用到包
+ "devDependencies": {
+    "babel-core": "^6.26.0",   //cnpm i babel-core babel-loader babel-plugin-transform-runtime -D
+    "babel-loader": "^7.1.2",
+    "babel-plugin-component": "^0.10.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",     //cnpm i babel-preset-env babel-preset-stage-0 -D
+    "babel-preset-stage-0": "^6.24.1",
+
+
+    "css-loader": "^0.28.7",     //cnpm i style-loader css-loader -D
+    "file-loader": "^1.1.5",
+    "less": "^2.7.3",
+    "less-loader": "^4.0.5",
+    "node-sass": "^4.5.3",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.19.0",
+    "url-loader": "^0.6.2",     //cnpm i url-loader file-loader -D
+
+
+    "vue-loader": "^13.3.0",
+    "vue-template-compiler": "^2.5.2",
+    "webpack": "^3.8.1",     //cnpm i webpack@3.4.1 -D
+    "html-webpack-plugin": "^2.30.1",    //cnpm i html-webpack-plugin -D
+    "webpack-dev-server": "^2.9.3"   //cnpm i webpack-dev-server -D 
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "mint-ui": "^2.2.9",
+    "vue": "^2.5.2",
+    "vue-resource": "^1.3.4",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
+  }
+
+
+
+promise  关于promise需要解决回调地狱问题的说明
+需求：使用了异步函数优雅处理的几种方式
+callback回调函数
+可以解决基本需求，但是处理的事件多了 会形成回调地狱的问题，而promise可以完美解决
+promise的本质是干什么的：就是单纯的为了解决回调地狱问题，并不能帮我们减少代码量
+1.promise是一个构造函数。
+2.promise上有两个函数，分别叫做resolve(成功之后的回调函数)和reject(失败之后的回调函数)
+3.在promise构造函数中有一个.then()方法，实例可以访问.then方法
+4.promise是一个异步操作
+5.这个异步操作只有两种状态：状态1 异步成功执行  状态2 异步执行失败，由于是异步操作不能用return返回，只能回调
+6.我们可以在promise实例上调用.then方法，[预先]指定异步操作，指定resolve和reject
+
+打开promise的正确使用方式
+核心：在上一个.then中，返回一个新的promise实例，可以使用下一个.then来处理
+catch的作用，如果前面有任何的promise执行失败，会立即终止所有的promise的执行，并马上进入catch去处理promise抛出的异常
+
+一个简单项目
+先在src中创建一个index.html作为起始页 里面创建一个<div id='app'>的vm实例对象
+之后创建一个main.js文件里面导入各种各样的包
+import Vue from 'vue'
+
+import VueRouter from 'vue-router'
+Vue.use(VueRouter)
+
+import VueResource from 'vue-resource'
+Vue.use(VueResource)
+Vue.http.options.root = 'http://vue.studyit.io';
+//设置请求的根路径
+
+import './lib/mui/css/mui.min.css'
+import './lib/mui/css/icons-extra.css'
+//导入MUI样式
+
+import { Header, Swipe, SwipeItem, Button } from 'mint-ui'
+Vue.component(Header.name,Header)
+Vue.component(Swipe.name, Swipe)
+Vue.component(SwipeItem.name, SwipeItem)
+Vue.component(Button.name, Button)
+//导入Mint-ui中的组件
+
+import router from './router.js'
+//导入自己的router.js路由模块
+
+import app from './App.app'
+//导入App组件
+
+var vm = new Vue({
+    el:'#app'
+    render:c => c(app),
+    router//挂载路由对象在vm实例上
+})
+//创建vm实例对象
+
+router.js文件用来导入路由组件和定义路由规则
+import VueRouter from 'vue-router'
+
+import HomeContainer from './components/tabbar/HomeContainer.vue'
+import MemberContainer from './components/tabbar/MemberContainer.vue'
+import ShopcarContainer from './components/tabbar/ShopcarContainer.vue'
+import SearchContainer from './components/tabbar/SearchContainer.vue'
+import NewsList from './components/news/NewsList.vue'
+import NewsInfo from './components/news/NewsInfo.vue'
+// 导入对应的路由组件
+
+var router = new VueRouter({
+    routes:[  // 配置路由规则
+        { path: '/', redirect: '/home' },
+        { path: '/home', component: HomeContainer },
+        { path: '/member', component: MemberContainer },
+        { path: '/shopcar', component: ShopcarContainer },
+        { path: '/search', component: SearchContainer },
+        { path: '/home/newslist', component: NewsList },
+        { path: '/home/newsinfo/:id', component: NewsInfo }
+    ]
+})
+//  创建路由对象
+
+export default router
+// 把路由对象暴露出去
+
+
+组件中的script中的数据和方法应该用export default{}暴露出去
+
+
+
+项目功能的实现(注意思路，代码只是思想的体现)
+
+
+   实现加载首页轮播图数据
+1. 获取数据， 如何获取呢， 使用 vue-resource
+2. 使用 vue-resource 的 this.$http.get 获取数据
+3. 获取到的数据，要保存到 data 身上
+4. 使用 v-for 循环渲染 每个 item 项
+
+   单独封装一个 comment.vue 评论子组件
+1. 先创建一个 单独的 comment.vue 组件模板
+2. 在需要使用 comment 组件的 页面中，先手动 导入 comment 组件
+ + `import comment from './comment.vue'`
+3. 在父组件中，使用 `components` 属性，将刚才导入 comment 组件，注册为自己的 子组件
+4. 将注册子组件时候的，注册名称，以 标签形式，在页面中 引用即可
+
+   实现点击加载更多评论的功能
+1. 为加载更多按钮，绑定点击事件，在事件中，请求 下一页数据
+2. 点击加载更多，让 pageIndex++ , 然后重新调用 this.getComments() 方法重新获取最新一页的数据
+3. 为了防止 新数据 覆盖老数据的情况，我们在 点击加载更多的时候，每当获取到新数据，应该让 老数据 调用 数组的 concat 方法，拼接上新数组
+  
+   发表评论
+1. 把文本框做双向数据绑定
+2. 为发表按钮绑定一个事件
+3. 校验评论内容是否为空，如果为空，则Toast提示用户 评论内容不能为空
+4. 通过 vue-resource 发送一个请求，把评论内容提交给 服务器
+5. 当发表评论OK后，重新刷新列表，以查看最新的评论
+ + 如果调用 getComments 方法重新刷新评论列表的话，可能只能得到 最后一页的评论，前几页的评论获取不到
+ + 换一种思路： 当评论成功后，在客户端，手动拼接出一个 最新的评论对象，然后 调用 数组的 unshift 方法， 把最新的评论，追加到  data 中 comments 的开头；这样，就能 完美实现刷新评论列表的需求；
+
+mui中js部分很不友好的
+
+    制作顶部滑动条的坑们：
+ 1. 需要借助于 MUI 中的 tab-top-webview-main.html 
+ 2. 需要把 slider 区域的 mui-fullscreen 类去掉
+ 3. 滑动条无法正常触发滑动，通过检查官方文档，发现这是JS组件，需要被初始化一下：
+  + 导入 mui.js 
+  + 调用官方提供的 方式 去初始化：
+  ```
+  mui('.mui-scroll-wrapper').scroll({
+    deceleration: 0.0005 //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+  });
+  ```
+ 4. 我们在初始化 滑动条 的时候，导入的 mui.js ，但是，控制台报错： `Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode`
+  + 经过我们合理的推测，觉得，可能是 mui.js 中用到了 'caller', 'callee', and 'arguments' 东西，但是， webpack 打包好的 bundle.js 中，默认是启用严格模式的，所以，这两者冲突了；
+  + 解决方案： 1. 把 mui.js 中的 非严格 模式的代码改掉；但是不现实； 2. 把 webpack 打包时候的严格模式禁用掉；
+  + 最终，我们选择了 plan B  移除严格模式： 使用这个插件 babel-plugin-transform-remove-strict-mode
+ 5. 刚进入 图片分享页面的时候， 滑动条无法正常工作， 经过我们认真的分析，发现， 如果要初始化 滑动条，必须要等 DOM 元素加载完毕，所以，我们把 初始化 滑动条 的代码，搬到了 mounted 生命周期函数中；
+ 6. 当 滑动条 调试OK后，发现， tabbar 无法正常工作了，这时候，我们需要把 每个 tabbar 按钮的 样式中  `mui-tab-item` 重新改一下名字；
+ 7. 获取所有分类，并渲染 分类列表；
+
+    制作图片列表区域
+1. 图片列表需要使用懒加载技术，我们可以使用 Mint-UI 提供的现成的 组件 `lazy-load`
+2. 根据`lazy-load`的使用文档，尝试使用
+3. 渲染图片列表数据
+    // 当 组件中的DOM结构被渲染好并放到页面中后，会执行这个 mounted()  钩子函数
+    // 如果要操作元素了，最好在 mounted 里面，因为，这里时候的 DOM 元素 是最新的
+
+    实现了 点击图片 跳转到 图片详情页面
+1. 在改造 li 成 router-link 的时候，需要使用 tag 属性指定要渲染为 哪种元素
+
+    实现 图片详情中 缩略图的功能
+1. 使用 插件 vue-preview 这个缩略图插件
+2. 获取到所有的图片列表，然后使用 v-for 指令渲染数据
+3. 注意： img标签上的class不能去掉
+4. 注意： 每个 图片数据对象中，必须有 w 和 h 属性
+
+
+ <!-- 在网页中，有两种跳转方式： -->
+    <!-- 方式1： 使用 a 标签 的形式叫做 标签跳转  -->
+    <!-- 方式2： 使用 window.location.href 的形式，叫做 编程式导航 -->
+
+    // 使用JS的形式进行路由导航
+
+      // 注意： 一定要区分 this.$route 和 this.$router 这两个对象，
+      // 其中： this.$route 是路由【参数对象】，所有路由中的参数， params, query 都属于它
+      // 其中： this.$router 是一个路由【导航对象】，用它 可以方便的 使用 JS 代码，实现路由的 前进、后退、 跳转到新的 URL 地址
+
+      // 1. 最简单的
+      // this.$router.push("/home/goodsinfo/" + id);
+      // 2. 传递对象
+      // this.$router.push({ path: "/home/goodsinfo/" + id });
+      // 3. 传递命名的路由
+      //this.$router.push({ name: "goodsinfo", params: { id } });
+
+
+vuex
+// 1. 运行  
+  cnpm i vuex -S 
+// 2. 导入包  
+  import Vuex from 'vuex'
+// 3. 注册vuex到vue中
+  Vue.use(Vuex)
+// 4. new Vuex.Store() 实例，得到一个 数据仓储对象
+var store = new Vuex.Store({
+  state: {
+    // 大家可以把 state 想象成 组件中的 data ,专门用来存储数据的
+    // 如果在 组件中，想要访问，store 中的数据，只能通过 this.$store.state.*** 来访问
+    count: 0
+  },
+  mutations: {
+    // 注意： 如果要操作 store 中的 state 值，只能通过 调用 mutations 提供的方法，才能操作对应的数据，不推荐直接操作 state 中的数据，因为 万一导致了数据的紊乱，不能快速定位到错误的原因，因为，每个组件都可能有操作数据的方法；
+    increment(state) {
+      state.count++
+    },
+    // 注意： 如果组件想要调用 mutations 中的方法，只能使用 this.$store.commit('方法名')
+    // 这种 调用 mutations 方法的格式，和 this.$emit('父组件中方法名')
+    subtract(state, obj) {
+      // 注意： mutations 的 函数参数列表中，最多支持两个参数，其中，参数1： 是 state 状态； 参数2： 通过 commit 提交过来的参数；
+      console.log(obj)
+      state.count -= (obj.c + obj.d)
+    }
+  },
+  getters: {
+    // 注意：这里的 getters， 只负责 对外提供数据，不负责 修改数据，如果想要修改 state 中的数据，请 去找 mutations
+    optCount: function (state) {
+      return '当前最新的count值是：' + state.count
+    }
+    // 经过咱们回顾对比，发现 getters 中的方法， 和组件中的过滤器比较类似，因为 过滤器和 getters 都没有修改原数据， 都是把原数据做了一层包装，提供给了 调用者；
+    // 其次， getters 也和 computed 比较像， 只要 state 中的数据发生变化了，那么，如果 getters 正好也引用了这个数据，那么 就会立即触发 getters 的重新求值；
+  }
+})
+import App from './App.vue'
+
+const vm = new Vue({
+  el: '#app',
+  render: c => c(App),
+  store // 5. 将 vuex 创建的 store 挂载到 VM 实例上， 只要挂载到了 vm 上，任何组件都能使用 store 来存取数据
+})
+
+// 总结：
+// 1. state中的数据，不能直接修改，如果想要修改，必须通过 mutations
+// 2. 如果组件想要直接 从 state 上获取数据： 需要 this.$store.state.***
+// 3. 如果 组件，想要修改数据，必须使用 mutations 提供的方法，需要通过 this.$store.commit('方法的名称'， 唯一的一个参数)
+// 4. 如果 store 中 state 上的数据， 在对外提供的时候，需要做一层包装，那么 ，推荐使用 getters, 如果需要使用 getters ,则用 this.$store.getters.***
